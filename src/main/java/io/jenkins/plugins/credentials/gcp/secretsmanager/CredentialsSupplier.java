@@ -1,10 +1,13 @@
 package io.jenkins.plugins.credentials.gcp.secretsmanager;
 
+import com.cloudbees.plugins.credentials.CredentialsUnavailableException;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.secretmanager.v1.ListSecretsRequest;
 import com.google.cloud.secretmanager.v1.ProjectName;
 import com.google.cloud.secretmanager.v1.Secret;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.PluginConfiguration;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CredentialsSupplier implements Supplier<Collection<StandardCredentials>> {
@@ -55,9 +57,9 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
       return credentials;
 
-    } catch (IOException e) {
-      LOG.log(Level.WARNING, "Could not create GCP secrets manager client", e.getMessage());
+    } catch (IOException | ApiException e) {
+      throw new CredentialsUnavailableException(
+          "secret", Messages.couldNotRetrieveCredentialError(), e);
     }
-    return Collections.emptyList();
   }
 }

@@ -41,8 +41,8 @@ public class GcpCertificateCredentials extends BaseStandardCredentials
       keyStore.load(stream, NO_PASSWORD);
       return keyStore;
     } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException ex) {
-      // TODO
-      throw new CredentialsUnavailableException("keyStore", ex.getMessage());
+      throw new CredentialsUnavailableException(
+          "keyStore", Messages.couldNotRetrieveCredentialError(), ex);
     }
   }
 

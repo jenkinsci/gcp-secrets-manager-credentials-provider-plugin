@@ -10,6 +10,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.model.ModelObject;
 import hudson.security.ACL;
 import hudson.security.Permission;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -116,6 +117,23 @@ public class GcpCredentialsStore extends CredentialsStore {
               "gcp-secrets-manager-credentials-provider/images/48x48/icon.png",
               Icon.ICON_XLARGE_STYLE,
               IconType.PLUGIN));
+    }
+
+    @Override
+    public String getIconFileName() {
+      return isVisible()
+          ? "/plugin/gcp-secrets-manager-credentials-provider/images/32x32/icon.png"
+          : null;
+    }
+
+    @Override
+    public String getIconClassName() {
+      return isVisible() ? ICON_CLASS : null;
+    }
+
+    @Override
+    public String getDisplayName() {
+      return Messages.gcpSecretsManager();
     }
 
     @NonNull

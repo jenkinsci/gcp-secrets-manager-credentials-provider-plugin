@@ -56,4 +56,9 @@ public class GcpCredentialsProvider extends CredentialsProvider {
   public CredentialsStore getStore(ModelObject object) {
     return object == Jenkins.getInstance() ? gcpCredentialsStore : null;
   }
+
+  @Override
+  public String getIconClassName() {
+    return "icon-gcp-secrets-manager-credentials-store";
+  }
 }

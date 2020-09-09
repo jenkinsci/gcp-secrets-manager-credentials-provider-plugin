@@ -15,7 +15,12 @@ creating and updating secrets.
 
 ## Usage
 
-Secrets must have the label with key `jenkins-credentials-type` and one of the following values:
+Once the plugin is installed, navigate to "Configure System" and find the "GCP Secrets Manager" section.
+Input the name of the GCP project that where the secrets are stored.
+
+Secret names (not values) are cached in-memory for 5 minutes. This is not currently configurable.
+
+Secrets created in GCP Secret Manager must have the label with key `jenkins-credentials-type` and one of the following values:
 
 * string
 * file
@@ -25,9 +30,9 @@ Secrets must have the label with key `jenkins-credentials-type` and one of the f
 
 ### IAM
 
-Give Jenkins read access to the Secret Manager with an IAM policy.
+Give Jenkins read access to the Secret Manager with an [Google Cloud IAM policy](https://cloud.google.com/iam/docs).
 
-It is required to give Jenkins the IAM role `roles/secretmanager.secretAccessor`. This can be done at the secret, project, 
+At minimum, give Jenkins the IAM role `roles/secretmanager.secretAccessor` at either the secret, project, 
 folder, or organization level.
 
 If you are running Jenkins on GCP, attach a [default service account](https://cloud.google.com/iam/docs/service-accounts#default)
@@ -50,10 +55,12 @@ echo -n 's3cr3t' | gcloud secrets create datadog-api-key \
   --project=my-project
 ```
 
+Scripted pipeline:
+
 ```
 node {
     withCredentials([string(credentialsId: 'datadog-api-key', variable: 'DATADOG_API_KEY')]) {
-        echo 'Hello world'
+        echo 'My string: $DATADOG_API_KEY'
     }
 }
 ```
@@ -61,21 +68,47 @@ node {
 ### File
 
 ```shell script
-gcloud secrets create file \
-  --data-file=my-file.zip \
-  --labels=jenkins-credentials-type=file,jenkins-credentials-file-extension=zip \
+gcloud secrets create serviceacount \
+  --data-file=my-file.json \
+  --labels=jenkins-credentials-type=file,jenkins-credentials-file-extension=json \
   --replication-policy=automatic \
   --project=my-project
+```
+
+Scripted pipeline:
+
+```
+node {
+    withCredentials([file(credentialsId: 'serviceaccount', variable: 'MY_FILE')]) {
+        echo 'My file path: $MY_FILE'
+    }
+}
 ```
 
 ### Username and Password
 
 ```shell script
-echo -n 's3cr3t' | gcloud secrets create taylor-user \
+echo -n 's3cr3t' | gcloud secrets create nexus-creds \
   --data-file=- \
-  --labels=jenkins-credentials-type=usernamePassword,jenkins-credentials-username=taylor \
+  --labels=jenkins-credentials-type=usernamePassword,jenkins-credentials-username=nexus-user \
   --replication-policy=automatic \
   --project=my-project
+```
+
+Scripted pipeline:
+
+```
+node {
+    withCredentials([
+        usernamePassword(
+            credentialsId: 'nexus-creds',
+            usernameVariable: 'NEXUS_USERNAME',
+            passwordVariable: 'NEXUS_PASSWORD'
+        )
+    ]) {
+        echo 'My credentials: $NEXUS_USERNAME:$NEXUS_PASSWORD'
+    }
+}
 ```
 
 ### SSH Key
@@ -88,6 +121,16 @@ gcloud secrets create ssh-key \
   --project=my-project
 ```
 
+Scripted pipeline:
+
+```
+node {
+    sshagent(credentials: ['ssh-key']) {
+        sh "ssh -T git@github.com"
+    }
+}
+```
+
 ### Certificate
 
 ```shell script
@@ -98,4 +141,24 @@ gcloud secrets create certificate \
   --project=my-project
 ```
 
+Scripted pipeline:
+
+```
+node {
+    withCredentials([
+        certificate(
+            credentialsId: 'certificate',
+            keystoreVariable: 'KEYSTORE_VARIABLE'
+        )
+    ]) {
+        echo 'My keystore: $KEYSTORE_VARIABLE'
+    }
+}
+```
+
 ## Limitations
+
+* The secret manager API does not support server-side filtering. 
+
+* The secret manager API does not support descriptions. The description of the secret will be the 
+same as the id.

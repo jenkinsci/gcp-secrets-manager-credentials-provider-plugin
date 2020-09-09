@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsUnavailableException;
 import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 
 public class GcpSecretGetter implements SecretGetter {
 
@@ -20,7 +21,7 @@ public class GcpSecretGetter implements SecretGetter {
       return response.getPayload().getData().toStringUtf8();
     } catch (ApiException e) {
       throw new CredentialsUnavailableException(
-          "secret", "Unable to retrieve secret from secret manager", e);
+          "secret", Messages.couldNotRetrieveCredentialError(), e);
     }
   }
 
@@ -31,7 +32,7 @@ public class GcpSecretGetter implements SecretGetter {
       return response.getPayload().getData().toByteArray();
     } catch (ApiException e) {
       throw new CredentialsUnavailableException(
-          "secret", "Unable to retrieve secret from secret manager", e);
+          "secret", Messages.couldNotRetrieveCredentialError(), e);
     }
   }
 }
