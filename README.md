@@ -4,7 +4,7 @@ Access credentials from [Google Cloud Secrets Manager](https://cloud.google.com/
 
 ## Setup
 
-Enable the GCP secret manager API via the GCP console or by running:
+Enable the Secrets Manager API via the GCP console or by running:
 
 ```shell script
 gcloud services enable secretmanager.googleapis.com --project=my-project
@@ -15,8 +15,8 @@ creating and updating secrets.
 
 ## Usage
 
-Once the plugin is installed, navigate to "Configure System" and find the "GCP Secrets Manager" section.
-Input the name of the GCP project that where the secrets are stored.
+To enable the plugin, go to "Configure System" and find the "GCP Secrets Manager" section.
+Input the name of the GCP project that contain the secrets.
 
 Secret names (not values) are cached in-memory for 5 minutes. This is not currently configurable.
 
@@ -24,13 +24,13 @@ Secrets created in GCP Secret Manager must have the label with key `jenkins-cred
 
 * string
 * file
-* usernamePassword
-* sshUserPrivateKey
+* username-password
+* ssh-user-private-key
 * certificate
 
 ### IAM
 
-Give Jenkins read access to the Secret Manager with an [Google Cloud IAM policy](https://cloud.google.com/iam/docs).
+Give Jenkins read access to the Secrets Manager with an [Google Cloud IAM policy](https://cloud.google.com/iam/docs).
 
 At minimum, give Jenkins an IAM role with the following permissions:
 
@@ -56,6 +56,8 @@ to the path of a JSON service account key with the above permissions.
 
 ### Secret Text
 
+Set the label `jenkins-credentials-type=string` to use the credential type.
+
 ```shell script
 echo -n 's3cr3t' | gcloud secrets create datadog-api-key \
   --data-file=- \
@@ -76,10 +78,17 @@ node {
 
 ### File
 
+Set the label `jenkins-credentials-type=file` to use the credential type.
+
+Additional labels:
+
+* jenkins-credentials-filename
+* jenkins-credentials-file-extension
+
 ```shell script
 gcloud secrets create serviceacount \
   --data-file=my-file.json \
-  --labels=jenkins-credentials-type=file,jenkins-credentials-file-extension=json \
+  --labels=jenkins-credentials-type=file,jenkins-credentials-filename=serviceaccount,jenkins-credentials-file-extension=json \
   --replication-policy=automatic \
   --project=my-project
 ```
@@ -96,10 +105,16 @@ node {
 
 ### Username and Password
 
+Set the label `jenkins-credentials-type=username-password` to use the credential type.
+
+Additional labels:
+
+* jenkins-credentials-username
+
 ```shell script
 echo -n 's3cr3t' | gcloud secrets create nexus-creds \
   --data-file=- \
-  --labels=jenkins-credentials-type=usernamePassword,jenkins-credentials-username=nexus-user \
+  --labels=jenkins-credentials-type=username-password,jenkins-credentials-username=nexus-user \
   --replication-policy=automatic \
   --project=my-project
 ```
@@ -122,10 +137,16 @@ node {
 
 ### SSH Key
 
+Set the label `jenkins-credentials-type=ssh-user-private-key` to use the credential type.
+
+Additional labels:
+
+* jenkins-credentials-username
+
 ```shell script
 gcloud secrets create ssh-key \
   --data-file=id_rsa \
-  --labels=jenkins-credentials-type=sshUserPrivateKey,jenkins-credentials-username=taylor \
+  --labels=jenkins-credentials-type=ssh-user-private-key,jenkins-credentials-username=taylor \
   --replication-policy=automatic \
   --project=my-project
 ```
@@ -141,6 +162,8 @@ node {
 ```
 
 ### Certificate
+
+Set the label `jenkins-credentials-type=certificate` to use the credential type.
 
 ```shell script
 gcloud secrets create certificate \
@@ -166,6 +189,9 @@ node {
 ```
 
 ## Limitations
+
+* Labels must contain only hyphens (-), underscores (_), lowercase characters, and numbers. Any usernames or 
+filenames in labels that have other characters will not be allowed.
 
 * The secret manager API does not support server-side filtering. 
 

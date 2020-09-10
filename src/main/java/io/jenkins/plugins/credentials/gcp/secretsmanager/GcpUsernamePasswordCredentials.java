@@ -1,6 +1,6 @@
 package io.jenkins.plugins.credentials.gcp.secretsmanager;
 
-import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 public class GcpUsernamePasswordCredentials extends BaseStandardCredentials
-    implements UsernamePasswordCredentials {
+    implements StandardUsernamePasswordCredentials {
 
   private final Supplier<Secret> password;
 
