@@ -15,11 +15,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 public class CredentialsSupplier implements Supplier<Collection<StandardCredentials>> {
-
-  private static final Logger LOG = Logger.getLogger(CredentialsSupplier.class.getName());
 
   public static Supplier<Collection<StandardCredentials>> standard() {
     return new CredentialsSupplier();
@@ -29,17 +26,15 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
   public Collection<StandardCredentials> get() {
     PluginConfiguration configuration = PluginConfiguration.getInstance();
 
-    if (configuration.getProject() == null || "".equals(configuration.getProject())) {
+    String projectId = configuration.getProject();
+
+    if (projectId == null || "".equals(projectId)) {
       return Collections.emptyList();
     }
 
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
-      final SecretGetter gcpSecretGetter = new GcpSecretGetter(client);
-
       ListSecretsRequest listSecretsRequest =
-          ListSecretsRequest.newBuilder()
-              .setParent(ProjectName.of(configuration.getProject()).toString())
-              .build();
+          ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString()).build();
 
       SecretManagerServiceClient.ListSecretsPagedResponse secrets =
           client.listSecrets(listSecretsRequest);
@@ -51,7 +46,8 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
           final String secretName = secret.getName();
           final String name = secretName.substring(secretName.lastIndexOf("/") + 1);
           final Map<String, String> labels = secret.getLabelsMap();
-          CredentialsFactory.create(name, labels, gcpSecretGetter).ifPresent(credentials::add);
+          CredentialsFactory.create(name, labels, new GcpSecretGetter(projectId))
+              .ifPresent(credentials::add);
         }
       }
 

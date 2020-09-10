@@ -4,33 +4,40 @@ import com.cloudbees.plugins.credentials.CredentialsUnavailableException;
 import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import com.google.cloud.secretmanager.v1.SecretPayload;
+import com.google.cloud.secretmanager.v1.SecretVersionName;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
+import java.io.IOException;
 
 public class GcpSecretGetter implements SecretGetter {
 
-  private final SecretManagerServiceClient client;
+  private final String projectId;
 
-  public GcpSecretGetter(final SecretManagerServiceClient client) {
-    this.client = client;
+  public GcpSecretGetter(String projectId) {
+    this.projectId = projectId;
   }
 
   @Override
   public String getSecretString(String id) {
-    try {
-      final AccessSecretVersionResponse response = client.accessSecretVersion(id);
-      return response.getPayload().getData().toStringUtf8();
-    } catch (ApiException e) {
-      throw new CredentialsUnavailableException(
-          "secret", Messages.couldNotRetrieveCredentialError(), e);
-    }
+    return getPayload(id).getData().toStringUtf8();
   }
 
   @Override
   public byte[] getSecretBytes(String id) {
-    try {
-      final AccessSecretVersionResponse response = client.accessSecretVersion(id);
-      return response.getPayload().getData().toByteArray();
-    } catch (ApiException e) {
+    return getPayload(id).getData().toByteArray();
+  }
+
+  private SecretPayload getPayload(String id) {
+    try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
+      final SecretVersionName secretVersionName =
+          SecretVersionName.newBuilder()
+              .setProject(projectId)
+              .setSecret(id)
+              .setSecretVersion("latest")
+              .build();
+      final AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
+      return response.getPayload();
+    } catch (IOException | ApiException e) {
       throw new CredentialsUnavailableException(
           "secret", Messages.couldNotRetrieveCredentialError(), e);
     }

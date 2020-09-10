@@ -1,6 +1,6 @@
 # GCP Secrets Manager Credentials Provider
 
-Access credentials from GCP Secrets Manager in your Jenkins jobs.
+Access credentials from [Google Cloud Secrets Manager](https://cloud.google.com/secret-manager) in your Jenkins jobs.
 
 ## Setup
 
@@ -32,8 +32,17 @@ Secrets created in GCP Secret Manager must have the label with key `jenkins-cred
 
 Give Jenkins read access to the Secret Manager with an [Google Cloud IAM policy](https://cloud.google.com/iam/docs).
 
-At minimum, give Jenkins the IAM role `roles/secretmanager.secretAccessor` at either the secret, project, 
-folder, or organization level.
+At minimum, give Jenkins an IAM role with the following permissions:
+
+* secretmanager.secrets.list
+* secretmanager.secrets.get
+* secretmanager.versions.list
+* secretmanager.versions.get
+* secretmanager.versions.access
+
+The easiest option is to give the Jenkins service account the pre-built roles `roles/secretmanager.secretAccessor` and 
+`roles/secretmanager.viewer`. This can be done at the secret, project, folder, or organization level.
+
 
 If you are running Jenkins on GCP, attach a [default service account](https://cloud.google.com/iam/docs/service-accounts#default)
 to the instance running Jenkins. You can use [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) 
