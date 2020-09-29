@@ -11,7 +11,6 @@ import hudson.model.ModelObject;
 import hudson.security.ACL;
 import hudson.security.Permission;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import jenkins.model.Jenkins;
@@ -34,45 +33,41 @@ public class GcpCredentialsStore extends CredentialsStore {
   @NonNull
   @Override
   public ModelObject getContext() {
-    return Jenkins.getInstance();
+    return Jenkins.get();
   }
 
   @Override
   public boolean hasPermission(
       @NonNull Authentication authentication, @NonNull Permission permission) {
     return CredentialsProvider.VIEW.equals(permission)
-        && Jenkins.getInstance().getACL().hasPermission(authentication, permission);
+        && Jenkins.get().getACL().hasPermission(authentication, permission);
   }
 
   @NonNull
   @Override
   public List<Credentials> getCredentials(@NonNull Domain domain) {
-    if (Domain.global().equals(domain)
-        && Jenkins.getInstance().hasPermission(CredentialsProvider.VIEW)) {
-      return provider.getCredentials(Credentials.class, Jenkins.getInstance(), ACL.SYSTEM);
+    if (Domain.global().equals(domain) && Jenkins.get().hasPermission(CredentialsProvider.VIEW)) {
+      return provider.getCredentials(Credentials.class, Jenkins.get(), ACL.SYSTEM);
     } else {
       return Collections.emptyList();
     }
   }
 
   @Override
-  public boolean addCredentials(@NonNull Domain domain, @NonNull Credentials credentials)
-      throws IOException {
+  public boolean addCredentials(@NonNull Domain domain, @NonNull Credentials credentials) {
     throw new UnsupportedOperationException(
         "Jenkins may not add credentials to GCP Secrets Manager");
   }
 
   @Override
-  public boolean removeCredentials(@NonNull Domain domain, @NonNull Credentials credentials)
-      throws IOException {
+  public boolean removeCredentials(@NonNull Domain domain, @NonNull Credentials credentials) {
     throw new UnsupportedOperationException(
         "Jenkins may not add credentials to GCP Secrets Manager");
   }
 
   @Override
   public boolean updateCredentials(
-      @NonNull Domain domain, @NonNull Credentials credentials, @NonNull Credentials credentials1)
-      throws IOException {
+      @NonNull Domain domain, @NonNull Credentials credentials, @NonNull Credentials credentials1) {
     throw new UnsupportedOperationException(
         "Jenkins may not add credentials to GCP Secrets Manager");
   }
