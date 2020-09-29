@@ -54,7 +54,7 @@ public class GcpCredentialsProvider extends CredentialsProvider {
 
   @Override
   public CredentialsStore getStore(ModelObject object) {
-    return object == Jenkins.getInstance() ? gcpCredentialsStore : null;
+    return object == Jenkins.get() ? gcpCredentialsStore : null;
   }
 
   @Override
