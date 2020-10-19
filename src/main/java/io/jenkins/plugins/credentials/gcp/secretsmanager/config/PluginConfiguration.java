@@ -10,7 +10,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class PluginConfiguration extends GlobalConfiguration {
 
   private String project;
-  private Filters filters;
+  private Filter filter;
 
   public PluginConfiguration() {
     load();
@@ -31,21 +31,21 @@ public class PluginConfiguration extends GlobalConfiguration {
     save();
   }
 
-  public Filters getFilters() {
-    return filters;
+  public Filter getFilter() {
+    return filter;
   }
 
   @DataBoundSetter
   @SuppressWarnings("unused")
-  public void setFilters(Filters filters) {
-    this.filters = filters;
+  public void setFilter(Filter filter) {
+    this.filter = filter;
     save();
   }
 
   @Override
   public synchronized boolean configure(StaplerRequest req, JSONObject json) {
     this.project = null;
-    this.filters = null;
+    this.filter = null;
 
     req.bindJSON(this, json);
     save();

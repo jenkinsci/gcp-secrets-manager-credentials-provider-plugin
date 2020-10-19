@@ -9,26 +9,25 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-public class Label extends AbstractDescribableImpl<Label> implements Serializable {
+public class Filter extends AbstractDescribableImpl<Filter> implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
-  private String key;
+  private String label;
   private String value;
 
   @DataBoundConstructor
-  public Label(String key, String value) {
-    this.key = key;
+  public Filter(String key, String value) {
+    this.label = key;
     this.value = value;
   }
 
-  public String getKey() {
-    return key;
+  public String getLabel() {
+    return label;
   }
 
   @DataBoundSetter
-  public void setKey(String key) {
-    this.key = key;
+  @SuppressWarnings("unused")
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public String getValue() {
@@ -36,6 +35,7 @@ public class Label extends AbstractDescribableImpl<Label> implements Serializabl
   }
 
   @DataBoundSetter
+  @SuppressWarnings("unused")
   public void setValue(String value) {
     this.value = value;
   }
@@ -43,11 +43,12 @@ public class Label extends AbstractDescribableImpl<Label> implements Serializabl
   @Extension
   @Symbol("filters")
   @SuppressWarnings("unused")
-  public static class DescriptorImpl extends Descriptor<Label> {
+  public static class DescriptorImpl extends Descriptor<Filter> {
+
     @Override
     @Nonnull
     public String getDisplayName() {
-      return "labels";
+      return "Filter";
     }
   }
 }
