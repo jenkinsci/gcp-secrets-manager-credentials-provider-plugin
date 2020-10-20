@@ -43,7 +43,7 @@ At minimum, give Jenkins an IAM role with the following permissions:
 * secretmanager.versions.access
 
 The easiest option is to give the Jenkins service account the pre-built roles `roles/secretmanager.secretAccessor` and 
-`roles/secretmanager.viewer`. This can be done at the secret, project, folder, or organization level.
+`roles/secretmanager.viewer` at the project-level.
 
 Jenkins will attempt to list all secrets for the configured project. If it doesn't have access to list secrets in the project,
 no secrets will be added to the credential store.

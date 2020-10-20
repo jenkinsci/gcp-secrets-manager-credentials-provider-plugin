@@ -60,9 +60,6 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
             if (!matchesLabel(labelValue, filters)) {
               continue;
             }
-
-          } else {
-            continue;
           }
         }
 
