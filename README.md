@@ -1,5 +1,7 @@
 # GCP Secrets Manager Credentials Provider
 
+[![GCP Secrets Manager Credentials Provider Plugin](https://img.shields.io/jenkins/plugin/v/gcp-secrets-manager-credentials-provider?style=flat-square)](https://plugins.jenkins.io/gcp-secrets-manager-credentials-provider/)
+
 Access credentials from [Google Cloud Secrets Manager](https://cloud.google.com/secret-manager) in your Jenkins jobs.
 
 ## Setup
@@ -34,15 +36,17 @@ Give Jenkins read access to the Secrets Manager with an [Google Cloud IAM policy
 
 At minimum, give Jenkins an IAM role with the following permissions:
 
-* secretmanager.secrets.list
-* secretmanager.secrets.get
+* secretmanager.secrets.list (project-level)
+* secretmanager.secrets.get (project-level)
 * secretmanager.versions.list
 * secretmanager.versions.get
 * secretmanager.versions.access
 
 The easiest option is to give the Jenkins service account the pre-built roles `roles/secretmanager.secretAccessor` and 
-`roles/secretmanager.viewer`. This can be done at the secret, project, folder, or organization level.
+`roles/secretmanager.viewer` at the project-level.
 
+Jenkins will attempt to list all secrets for the configured project. If it doesn't have access to list secrets in the project,
+no secrets will be added to the credential store.
 
 If you are running Jenkins on GCP, attach a [default service account](https://cloud.google.com/iam/docs/service-accounts#default)
 to the instance running Jenkins. You can use [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) 
@@ -51,6 +55,15 @@ if running Jenkins on Google Kubernetes Engine.
 If you are not running Jenkins on GCP, set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` for the Jenkins process
 to the path of a JSON service account key with the above permissions.
 
+### Filtering
+
+If you are sharing a GCP project across multiple Jenkins instances, you can use the filtering feature to control which
+secrets get added to the credential store. This feature allows you to specify a custom label and value(s) that each 
+secret must have in order to be added to the store. Note that Jenkins will still need IAM permissions to list and get all other secrets - 
+GCP Secrets Manager does not currently support "server-side" filtering.
+
+You can use a comma-separated string for the label value, which will tell Jenkins to add the secret to the store
+if it matches any of the provided values.
 
 ## Examples
 

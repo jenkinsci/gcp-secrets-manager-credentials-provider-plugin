@@ -7,6 +7,7 @@ import com.google.cloud.secretmanager.v1.ListSecretsRequest;
 import com.google.cloud.secretmanager.v1.ProjectName;
 import com.google.cloud.secretmanager.v1.Secret;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Filter;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.PluginConfiguration;
 import java.io.IOException;
@@ -25,8 +26,14 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
   @Override
   public Collection<StandardCredentials> get() {
     PluginConfiguration configuration = PluginConfiguration.getInstance();
-
     String projectId = configuration.getProject();
+    Filter filter = configuration.getFilter();
+
+    String[] filters = new String[0];
+
+    if (filter.getValue() != null) {
+      filters = filter.getValue().split(",");
+    }
 
     if (projectId == null || "".equals(projectId)) {
       return Collections.emptyList();
@@ -42,7 +49,21 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
       final Collection<StandardCredentials> credentials = new ArrayList<>();
 
       for (Secret secret : secrets.iterateAll()) {
-        if (secret.getLabelsMap().containsKey(Labels.TYPE.toLowerCase())) {
+        Map<String, String> labelsMap = secret.getLabelsMap();
+
+        if (filter.getLabel() != null && filter.getValue() != null) {
+          final String matchingLabel = filter.getLabel();
+
+          if (labelsMap.containsKey(matchingLabel)) {
+            final String labelValue = labelsMap.get(matchingLabel);
+
+            if (!matchesLabel(labelValue, filters)) {
+              continue;
+            }
+          }
+        }
+
+        if (labelsMap.containsKey(Labels.TYPE.toLowerCase())) {
           final String secretName = secret.getName();
           final String name = secretName.substring(secretName.lastIndexOf("/") + 1);
           final Map<String, String> labels = secret.getLabelsMap();
@@ -57,5 +78,14 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
       throw new CredentialsUnavailableException(
           "secret", Messages.couldNotRetrieveCredentialError(), e);
     }
+  }
+
+  private boolean matchesLabel(final String labelValue, String[] filters) {
+    for (String filter : filters) {
+      if (labelValue.equals(filter)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
