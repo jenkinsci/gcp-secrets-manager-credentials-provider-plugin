@@ -50,7 +50,7 @@
         <jenkins.version>2.222.4</jenkins.version>
         <java.level>8</java.level>
         <jcasc.version>1.35</jcasc.version>
-        <spotless.version>2.4.2</spotless.version>
+        <spotless.version>2.5.0</spotless.version>
     </properties>
 
     <dependencyManagement>
