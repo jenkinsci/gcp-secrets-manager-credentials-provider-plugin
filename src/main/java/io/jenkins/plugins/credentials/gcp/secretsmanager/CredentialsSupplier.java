@@ -31,7 +31,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
     String[] filters = new String[0];
 
-    if (filter.getValue() != null) {
+    if (filter != null && filter.getValue() != null) {
       filters = filter.getValue().split(",");
     }
 
@@ -51,7 +51,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
       for (Secret secret : secrets.iterateAll()) {
         Map<String, String> labelsMap = secret.getLabelsMap();
 
-        if (filter.getLabel() != null && filter.getValue() != null) {
+        if (filter != null && filter.getLabel() != null && filter.getValue() != null) {
           final String matchingLabel = filter.getLabel();
 
           if (labelsMap.containsKey(matchingLabel)) {
