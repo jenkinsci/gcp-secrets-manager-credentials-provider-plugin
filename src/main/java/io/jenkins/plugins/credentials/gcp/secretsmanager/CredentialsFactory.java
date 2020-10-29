@@ -3,6 +3,7 @@ package io.jenkins.plugins.credentials.gcp.secretsmanager;
 import com.cloudbees.plugins.credentials.SecretBytes;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.util.Secret;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -41,7 +42,7 @@ public class CredentialsFactory {
     }
   }
 
-  private static class SecretBytesSupplier implements Supplier<SecretBytes> {
+  private static class SecretBytesSupplier implements Supplier<SecretBytes>, Serializable {
 
     private final String id;
     private final transient SecretGetter secretGetter;
@@ -57,7 +58,7 @@ public class CredentialsFactory {
     }
   }
 
-  private static class SecretSupplier implements Supplier<Secret> {
+  private static class SecretSupplier implements Supplier<Secret>, Serializable {
 
     private final String id;
     private final transient SecretGetter secretGetter;
