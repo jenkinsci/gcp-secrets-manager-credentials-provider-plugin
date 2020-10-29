@@ -44,6 +44,8 @@ public class CredentialsFactory {
 
   private static class SecretBytesSupplier implements Supplier<SecretBytes>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private final String id;
     private final transient SecretGetter secretGetter;
 
@@ -59,6 +61,8 @@ public class CredentialsFactory {
   }
 
   private static class SecretSupplier implements Supplier<Secret>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String id;
     private final transient SecretGetter secretGetter;
