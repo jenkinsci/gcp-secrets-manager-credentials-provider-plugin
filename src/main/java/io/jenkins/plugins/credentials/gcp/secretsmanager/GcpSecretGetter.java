@@ -8,8 +8,11 @@ import com.google.cloud.secretmanager.v1.SecretPayload;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 import java.io.IOException;
+import java.io.Serializable;
 
-public class GcpSecretGetter implements SecretGetter {
+public class GcpSecretGetter implements SecretGetter, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final String projectId;
 
