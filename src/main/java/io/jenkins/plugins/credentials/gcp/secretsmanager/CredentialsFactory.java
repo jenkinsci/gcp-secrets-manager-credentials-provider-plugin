@@ -47,7 +47,7 @@ public class CredentialsFactory {
     private static final long serialVersionUID = 1L;
 
     private final String id;
-    private final transient SecretGetter secretGetter;
+    private final SecretGetter secretGetter;
 
     public SecretBytesSupplier(String id, SecretGetter secretGetter) {
       this.id = id;
@@ -65,7 +65,7 @@ public class CredentialsFactory {
     private static final long serialVersionUID = 1L;
 
     private final String id;
-    private final transient SecretGetter secretGetter;
+    private final SecretGetter secretGetter;
 
     public SecretSupplier(String id, SecretGetter secretGetter) {
       this.id = id;
