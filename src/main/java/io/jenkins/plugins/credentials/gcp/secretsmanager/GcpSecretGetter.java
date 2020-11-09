@@ -3,6 +3,7 @@ package io.jenkins.plugins.credentials.gcp.secretsmanager;
 import com.cloudbees.plugins.credentials.CredentialsUnavailableException;
 import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
+import com.google.cloud.secretmanager.v1.ProjectName;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretPayload;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
@@ -32,9 +33,10 @@ public class GcpSecretGetter implements SecretGetter, Serializable {
 
   private SecretPayload getPayload(String id) {
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
+      final ProjectName project = ProjectName.of(projectId);
       final SecretVersionName secretVersionName =
           SecretVersionName.newBuilder()
-              .setProject(projectId)
+              .setProject(project.getProject())
               .setSecret(id)
               .setSecretVersion("latest")
               .build();
