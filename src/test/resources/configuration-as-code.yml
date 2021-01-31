@@ -1,0 +1,6 @@
+unclassified:
+  gcpCredentialsProvider:
+    filter:
+      label: "my-label"
+      value: "my-value"
+    project: "gcp-project"

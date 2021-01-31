@@ -53,7 +53,47 @@ to the instance running Jenkins. You can use [Workload Identity](https://cloud.g
 if running Jenkins on Google Kubernetes Engine.
 
 If you are not running Jenkins on GCP, set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` for the Jenkins process
-to the path of a JSON service account key with the above permissions.
+to the path of a [JSON service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) with the above permissions.
+
+When using JSON service account keys, both the master and agents must have the environment variable `GOOGLE_APPLICATION_CREDENTIALS`
+set to an accessible file. For example, when using the Kubernetes plugin it is recommended to provide 
+a secret volume that mounts the file into the agent pod:
+
+```groovy
+podTemplate(yaml: """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    env: 
+    - name: GOOGLE_APPLICATION_CREDENTIALS 
+      value: /jenkins/sa.json 
+    volumeMounts: 
+    - name: gcp-sa-secret
+      mountPath: "/jenkins" 
+      readOnly: true
+  volumes:
+  - name: gcp-sa-secret
+    secret:
+      secretName: gcp-sa-secret 
+"""
+) {
+    node(POD_LABEL) {
+        ...
+    }
+}
+```
+
+Where the secret was created with the following command:
+
+```shell script
+kubectl create secret generic gcp-sa-secret --from-file=/tmp/sa.json
+```
 
 ### Filtering
 
@@ -64,6 +104,19 @@ GCP Secrets Manager does not currently support "server-side" filtering.
 
 You can use a comma-separated string for the label value, which will tell Jenkins to add the secret to the store
 if it matches any of the provided values.
+
+### JCasC
+
+You can use [JCasC](https://www.jenkins.io/projects/jcasc/) to set the GCP project and label filters.
+
+```yaml
+unclassified:
+  gcpCredentialsProvider:
+    filter:
+      label: "my-label"
+      value: "my-value-1,my-value-2"
+    project: "my-gcp-project"
+```
 
 ## Examples
 
