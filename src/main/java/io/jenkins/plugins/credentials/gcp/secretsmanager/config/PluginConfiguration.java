@@ -3,10 +3,12 @@ package io.jenkins.plugins.credentials.gcp.secretsmanager.config;
 import hudson.Extension;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 @Extension
+@Symbol("gcpCredentialsProvider")
 public class PluginConfiguration extends GlobalConfiguration {
 
   private String project;

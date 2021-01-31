@@ -15,8 +15,8 @@ public class Filter extends AbstractDescribableImpl<Filter> implements Serializa
   private String value;
 
   @DataBoundConstructor
-  public Filter(String key, String value) {
-    this.label = key;
+  public Filter(String label, String value) {
+    this.label = label;
     this.value = value;
   }
 
@@ -41,7 +41,7 @@ public class Filter extends AbstractDescribableImpl<Filter> implements Serializa
   }
 
   @Extension
-  @Symbol("filters")
+  @Symbol("filter")
   @SuppressWarnings("unused")
   public static class DescriptorImpl extends Descriptor<Filter> {
 
