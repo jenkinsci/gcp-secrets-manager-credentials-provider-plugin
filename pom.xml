@@ -90,6 +90,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>variant</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-secretmanager</artifactId>
             <exclusions>
