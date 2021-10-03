@@ -95,15 +95,26 @@ Where the secret was created with the following command:
 kubectl create secret generic gcp-sa-secret --from-file=/tmp/sa.json
 ```
 
-### Filtering
+### Client Side Filtering
 
 If you are sharing a GCP project across multiple Jenkins instances, you can use the filtering feature to control which
 secrets get added to the credential store. This feature allows you to specify a custom label and value(s) that each 
-secret must have in order to be added to the store. Note that Jenkins will still need IAM permissions to list and get all other secrets - 
-GCP Secrets Manager does not currently support "server-side" filtering.
+secret must have in order to be added to the store. Note that Jenkins will still need IAM permissions to list and get all other secrets.
 
 You can use a comma-separated string for the label value, which will tell Jenkins to add the secret to the store
 if it matches any of the provided values.
+
+### Server Side Filtering
+
+Server side filtering allows to filter on several properties, a list of Learn more about [Secret Manager server-side filtering in the documentation](https://cloud.google.com/secret-manager/docs/filtering).
+
+Examples:  
+_Retrive only secrets with the label of the value production_
+
+```
+labels.environment:production
+```
+
 
 ### JCasC
 
@@ -258,8 +269,6 @@ node {
 
 * Labels must contain only hyphens (-), underscores (_), lowercase characters, and numbers. Any usernames or 
 filenames in labels that have other characters will not be allowed.
-
-* The secret manager API does not support server-side filtering. 
 
 * The secret manager API does not support descriptions. The description of the secret will be the 
 same as the id.

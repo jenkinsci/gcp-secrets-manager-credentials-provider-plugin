@@ -64,7 +64,7 @@
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>15.0.0</version>
+                <version>23.1.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -119,6 +119,11 @@
                     <artifactId>jackson2-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
         </dependency>
     </dependencies>
 
