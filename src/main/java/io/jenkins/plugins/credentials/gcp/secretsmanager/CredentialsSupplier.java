@@ -52,19 +52,18 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       final Collection<StandardCredentials> credentials = new ArrayList<>();
-
       for (String projectId : projectIds) {
         projectId = projectId.trim();
-            
+
         ListSecretsRequest listSecretsRequest;
-      
-        Builder builder = 
-          ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
-      
+
+        Builder builder =
+            ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
+
         if (serverSideFilter != null && serverSideFilter.getFilter() != null ) {
           builder.setFilter(serverSideFilter.getFilter());
         }
-            
+
         listSecretsRequest = builder.build();
 
         SecretManagerServiceClient.ListSecretsPagedResponse secrets =
