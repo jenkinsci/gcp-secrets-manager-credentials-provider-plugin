@@ -18,7 +18,7 @@ creating and updating secrets.
 ## Usage
 
 To enable the plugin, go to "Configure System" and find the "GCP Secrets Manager" section.
-Input the name of the GCP project that contain the secrets.
+Input the name of the GCP projects that contain the secrets.
 
 Secret names (not values) are cached in-memory for 5 minutes. This is not currently configurable.
 
@@ -45,7 +45,7 @@ At minimum, give Jenkins an IAM role with the following permissions:
 The easiest option is to give the Jenkins service account the pre-built roles `roles/secretmanager.secretAccessor` and 
 `roles/secretmanager.viewer` at the project-level.
 
-Jenkins will attempt to list all secrets for the configured project. If it doesn't have access to list secrets in the project,
+Jenkins will attempt to list all secrets for the configured projects. If it doesn't have access to list secrets in the projects,
 no secrets will be added to the credential store.
 
 If you are running Jenkins on GCP, attach a [default service account](https://cloud.google.com/iam/docs/service-accounts#default)
@@ -126,7 +126,7 @@ unclassified:
     filter:
       label: "my-label"
       value: "my-value-1,my-value-2"
-    project: "my-gcp-project"
+    project: "my-gcp-project1,my-gcp-project2"
 ```
 
 ## Examples

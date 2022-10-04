@@ -58,7 +58,7 @@ public class GcpSshUserPrivateKey extends BaseStandardCredentials implements SSH
 
     @Override
     public String getIconClassName() {
-      return "icon-ssh-credentials-ssh-key";
+      return "icon-fingerprint";
     }
   }
 }

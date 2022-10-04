@@ -33,60 +33,67 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
   @Override
   public Collection<StandardCredentials> get() {
     PluginConfiguration configuration = PluginConfiguration.getInstance();
-    String projectId = configuration.getProject();
+    String project = configuration.getProject();
     Filter filter = configuration.getFilter();
     ServerSideFilter serverSideFilter = configuration.getServerSideFilter();
 
+    String[] projectIds = new String[0];
     String[] filters = new String[0];
 
     if (filter != null && filter.getValue() != null) {
       filters = filter.getValue().split(",");
     }
 
-    if (projectId == null || "".equals(projectId)) {
+    if (project == null || "".equals(project)) {
       return Collections.emptyList();
+    } else {
+      projectIds = project.split(",");
     }
 
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
-      ListSecretsRequest listSecretsRequest;
-      
-      Builder builder = 
-        ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
-      
-      if (serverSideFilter != null && serverSideFilter.getFilter() != null ) {
-        builder.setFilter(serverSideFilter.getFilter());
-      }
-            
-      listSecretsRequest = builder.build();
-
-      SecretManagerServiceClient.ListSecretsPagedResponse secrets =
-          client.listSecrets(listSecretsRequest);
-
       final Collection<StandardCredentials> credentials = new ArrayList<>();
 
-      for (Secret secret : secrets.iterateAll()) {
-        Map<String, String> labelsMap = secret.getLabelsMap();
+      for (String projectId : projectIds) {
+        projectId = projectId.trim();
+            
+        ListSecretsRequest listSecretsRequest;
+      
+        Builder builder = 
+          ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
+      
+        if (serverSideFilter != null && serverSideFilter.getFilter() != null ) {
+          builder.setFilter(serverSideFilter.getFilter());
+        }
+            
+        listSecretsRequest = builder.build();
 
-        if (filter != null && filter.getLabel() != null && filter.getValue() != null) {
-          final String matchingLabel = filter.getLabel();
+        SecretManagerServiceClient.ListSecretsPagedResponse secrets =
+            client.listSecrets(listSecretsRequest);
 
-          if (labelsMap.containsKey(matchingLabel)) {
-            final String labelValue = labelsMap.get(matchingLabel);
+        for (Secret secret : secrets.iterateAll()) {
+          Map<String, String> labelsMap = secret.getLabelsMap();
 
-            if (!matchesLabel(labelValue, filters)) {
+          if (filter != null && filter.getLabel() != null && filter.getValue() != null) {
+            final String matchingLabel = filter.getLabel();
+
+            if (labelsMap.containsKey(matchingLabel)) {
+              final String labelValue = labelsMap.get(matchingLabel);
+
+              if (!matchesLabel(labelValue, filters)) {
+                continue;
+              }
+            } else {
               continue;
             }
-          } else {
-            continue;
           }
-        }
 
-        if (labelsMap.containsKey(Labels.TYPE.toLowerCase())) {
-          final String secretName = secret.getName();
-          final String name = secretName.substring(secretName.lastIndexOf("/") + 1);
-          final Map<String, String> labels = secret.getLabelsMap();
-          CredentialsFactory.create(name, labels, new GcpSecretGetter(projectId))
-              .ifPresent(credentials::add);
+          if (labelsMap.containsKey(Labels.TYPE.toLowerCase())) {
+            final String secretName = secret.getName();
+            final String name = secretName.substring(secretName.lastIndexOf("/") + 1);
+            final Map<String, String> labels = secret.getLabelsMap();
+            CredentialsFactory.create(name, labels, new GcpSecretGetter(projectId))
+                .ifPresent(credentials::add);
+          }
         }
       }
 

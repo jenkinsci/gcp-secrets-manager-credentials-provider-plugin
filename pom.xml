@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.25</version>
+        <version>4.47</version>
         <relativePath />
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>gcp-secrets-manager-credentials-provider</artifactId>
-    <version>0.2.7-SNAPSHOT</version>
+    <version>0.2.8-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <name>GCP Secrets Manager Credentials Provider</name>
@@ -47,24 +47,24 @@
     </scm>
 
     <properties>
-        <jenkins.version>2.263</jenkins.version>
+        <jenkins.version>2.332.1</jenkins.version>
         <java.level>8</java.level>
-        <spotless.version>2.13.0</spotless.version>
+        <spotless.version>2.27.0</spotless.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.263.x</artifactId>
-                <version>21</version>
+                <artifactId>bom-2.332.x</artifactId>
+                <version>1494.v5d4d71876757</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>23.1.0</version>
+                <version>26.1.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.20.2</version>
+            <version>3.23.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
