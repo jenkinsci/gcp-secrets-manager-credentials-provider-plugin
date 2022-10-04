@@ -47,8 +47,8 @@
     </scm>
 
     <properties>
-        <jenkins.version>2.332.1</jenkins.version>
-        <java.level>8</java.level>
+        <jenkins.version>2.361.1</jenkins.version>
+        <java.level>11</java.level>
         <spotless.version>2.27.0</spotless.version>
     </properties>
 
@@ -56,8 +56,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.332.x</artifactId>
-                <version>1494.v5d4d71876757</version>
+                <artifactId>bom-2.361.x</artifactId>
+                <version>1607.va_c1576527071</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -136,6 +136,7 @@
                 <configuration>
                     <maskClasses>
                         com.google.common.
+                        com.google.protobuf.
                     </maskClasses>
                     <minimumJavaVersion />
                 </configuration>

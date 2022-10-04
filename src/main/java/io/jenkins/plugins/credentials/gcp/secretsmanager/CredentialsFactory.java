@@ -11,7 +11,8 @@ import java.util.function.Supplier;
 public class CredentialsFactory {
 
   public static Optional<StandardCredentials> create(
-      String name, Map<String, String> labels, SecretGetter secretGetter) {
+      String name, String project, Map<String, String> labels, SecretGetter secretGetter) {
+    final String description = name + " (" + project + ")";
     final String type = labels.getOrDefault(Labels.TYPE, "");
     final String username = labels.getOrDefault(Labels.USERNAME, "");
     final String fileExtension = labels.getOrDefault(Labels.FILE_EXTENSION, "");
@@ -23,20 +24,24 @@ public class CredentialsFactory {
 
     switch (type) {
       case Type.STRING:
-        return Optional.of(new GcpStringCredentials(name, new SecretSupplier(name, secretGetter)));
+        return Optional.of(
+            new GcpStringCredentials(name, description, new SecretSupplier(name, secretGetter)));
       case Type.FILE:
         return Optional.of(
-            new GcpFileCredentials(name, filename, new SecretBytesSupplier(name, secretGetter)));
+            new GcpFileCredentials(
+                name, description, filename, new SecretBytesSupplier(name, secretGetter)));
       case Type.USERNAME_PASSWORD:
         return Optional.of(
             new GcpUsernamePasswordCredentials(
-                name, new SecretSupplier(name, secretGetter), username));
+                name, description, new SecretSupplier(name, secretGetter), username));
       case Type.SSH_USER_PRIVATE_KEY:
         return Optional.of(
-            new GcpSshUserPrivateKey(name, new SecretSupplier(name, secretGetter), username));
+            new GcpSshUserPrivateKey(
+                name, description, new SecretSupplier(name, secretGetter), username));
       case Type.CERTIFICATE:
         return Optional.of(
-            new GcpCertificateCredentials(name, new SecretBytesSupplier(name, secretGetter)));
+            new GcpCertificateCredentials(
+                name, description, new SecretBytesSupplier(name, secretGetter)));
       default:
         return Optional.empty();
     }

@@ -37,7 +37,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
     Filter filter = configuration.getFilter();
     ServerSideFilter serverSideFilter = configuration.getServerSideFilter();
 
-    String[] projectIds = new String[0];
+    String[] projectIds;
     String[] filters = new String[0];
 
     if (filter != null && filter.getValue() != null) {
@@ -91,7 +91,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
             final String secretName = secret.getName();
             final String name = secretName.substring(secretName.lastIndexOf("/") + 1);
             final Map<String, String> labels = secret.getLabelsMap();
-            CredentialsFactory.create(name, labels, new GcpSecretGetter(projectId))
+            CredentialsFactory.create(name, projectId, labels, new GcpSecretGetter(projectId))
                 .ifPresent(credentials::add);
           }
         }
