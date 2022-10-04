@@ -6,9 +6,13 @@ import com.google.cloud.secretmanager.v1.ListSecretsRequest;
 import com.google.cloud.secretmanager.v1.ProjectName;
 import com.google.cloud.secretmanager.v1.Secret;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import com.google.cloud.secretmanager.v1.ListSecretsRequest.Builder;
+
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Filter;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.PluginConfiguration;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.ServerSideFilter;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +35,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
     PluginConfiguration configuration = PluginConfiguration.getInstance();
     String project = configuration.getProject();
     Filter filter = configuration.getFilter();
+    ServerSideFilter serverSideFilter = configuration.getServerSideFilter();
 
     String[] projectIds = new String[0];
     String[] filters = new String[0];
@@ -50,9 +55,17 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
       for (String projectId : projectIds) {
         projectId = projectId.trim();
-
-        ListSecretsRequest listSecretsRequest =
-            ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString()).build();
+            
+        ListSecretsRequest listSecretsRequest;
+      
+        Builder builder = 
+          ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
+      
+        if (serverSideFilter != null && serverSideFilter.getFilter() != null ) {
+          builder.setFilter(serverSideFilter.getFilter());
+        }
+            
+        listSecretsRequest = builder.build();
 
         SecretManagerServiceClient.ListSecretsPagedResponse secrets =
             client.listSecrets(listSecretsRequest);
