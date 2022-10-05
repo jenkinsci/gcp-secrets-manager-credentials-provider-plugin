@@ -58,7 +58,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
         Builder builder =
             ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
 
-        if (serverSideFilter != null && serverSideFilter.getFilter() != null ) {
+        if (serverSideFilter != null && serverSideFilter.getFilter() != null) {
           builder.setFilter(serverSideFilter.getFilter());
         }
 
