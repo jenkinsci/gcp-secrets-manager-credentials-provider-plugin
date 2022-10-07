@@ -9,34 +9,35 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-public class ServerSideFilter extends AbstractDescribableImpl<ServerSideFilter> implements Serializable {
+public class ServerSideFilter extends AbstractDescribableImpl<ServerSideFilter>
+    implements Serializable {
 
-    private String filter;
+  private String filter;
 
-    @DataBoundConstructor
-    public ServerSideFilter(String filter) {
-        this.filter = filter;
+  @DataBoundConstructor
+  public ServerSideFilter(String filter) {
+    this.filter = filter;
+  }
+
+  public String getFilter() {
+    return filter;
+  }
+
+  @DataBoundSetter
+  @SuppressWarnings("unused")
+  public void setLabel(String filter) {
+    this.filter = filter;
+  }
+
+  @Extension
+  @Symbol("serversidefilter")
+  @SuppressWarnings("unused")
+  public static class DescriptorImpl extends Descriptor<ServerSideFilter> {
+
+    @Override
+    @Nonnull
+    public String getDisplayName() {
+      return "Server-side Filter";
     }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    @DataBoundSetter
-    @SuppressWarnings("unused")
-    public void setLabel(String filter) {
-        this.filter = filter;
-    }
-
-    @Extension
-    @Symbol("serversidefilter")
-    @SuppressWarnings("unused")
-    public static class DescriptorImpl extends Descriptor<ServerSideFilter> {
-
-        @Override
-        @Nonnull
-        public String getDisplayName() {
-            return "Server-side Filter";
-        }
-    }
+  }
 }

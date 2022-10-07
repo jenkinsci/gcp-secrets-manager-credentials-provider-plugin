@@ -12,8 +12,8 @@ public class GcpStringCredentials extends BaseStandardCredentials implements Str
 
   private final Supplier<Secret> valueSupplier;
 
-  public GcpStringCredentials(String id, Supplier<Secret> valueSupplier) {
-    super(id, id);
+  public GcpStringCredentials(String id, String description, Supplier<Secret> valueSupplier) {
+    super(id, description);
     this.valueSupplier = valueSupplier;
   }
 

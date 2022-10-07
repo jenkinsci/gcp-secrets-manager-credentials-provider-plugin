@@ -16,8 +16,9 @@ public class GcpUsernamePasswordCredentials extends BaseStandardCredentials
 
   private final String username;
 
-  public GcpUsernamePasswordCredentials(String id, Supplier<Secret> password, String username) {
-    super(id, id);
+  public GcpUsernamePasswordCredentials(
+      String id, String description, Supplier<Secret> password, String username) {
+    super(id, description);
     this.password = password;
     this.username = username;
   }

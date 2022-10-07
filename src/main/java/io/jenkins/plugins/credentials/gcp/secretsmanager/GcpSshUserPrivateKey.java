@@ -17,8 +17,9 @@ public class GcpSshUserPrivateKey extends BaseStandardCredentials implements SSH
   private final Supplier<Secret> privateKey;
   private final String username;
 
-  public GcpSshUserPrivateKey(String id, Supplier<Secret> privateKey, String username) {
-    super(id, id);
+  public GcpSshUserPrivateKey(
+      String id, String description, Supplier<Secret> privateKey, String username) {
+    super(id, description);
     this.privateKey = privateKey;
     this.username = username;
   }

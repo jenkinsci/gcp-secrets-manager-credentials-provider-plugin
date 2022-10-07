@@ -16,8 +16,9 @@ public class GcpFileCredentials extends BaseStandardCredentials implements FileC
 
   private final Supplier<SecretBytes> content;
 
-  public GcpFileCredentials(String id, String filename, Supplier<SecretBytes> content) {
-    super(id, id);
+  public GcpFileCredentials(
+      String id, String description, String filename, Supplier<SecretBytes> content) {
+    super(id, description);
     this.filename = filename;
     this.content = content;
   }

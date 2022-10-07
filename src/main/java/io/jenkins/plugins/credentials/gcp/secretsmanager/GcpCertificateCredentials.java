@@ -26,8 +26,8 @@ public class GcpCertificateCredentials extends BaseStandardCredentials
 
   private final Supplier<SecretBytes> keyStore;
 
-  public GcpCertificateCredentials(String id, Supplier<SecretBytes> keyStore) {
-    super(id, id);
+  public GcpCertificateCredentials(String id, String project, Supplier<SecretBytes> keyStore) {
+    super(id, project);
     this.keyStore = keyStore;
   }
 

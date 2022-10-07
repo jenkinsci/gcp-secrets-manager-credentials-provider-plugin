@@ -39,10 +39,12 @@ public class CredentialsFactoryTest {
         };
 
     Optional<StandardCredentials> credential =
-        CredentialsFactory.create("foo", labels, mockSecretGetter);
+        CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
 
     assertThat(credential).isNotEmpty();
     assertThat(credential.get()).isInstanceOf(GcpStringCredentials.class);
+    assertThat(((GcpStringCredentials) credential.get()).getSecret().getPlainText())
+        .isEqualTo("bar");
     assertThat(((GcpStringCredentials) credential.get()).getSecret().getPlainText())
         .isEqualTo("bar");
   }
@@ -70,7 +72,7 @@ public class CredentialsFactoryTest {
         };
 
     Optional<StandardCredentials> credential =
-        CredentialsFactory.create("foo", labels, mockSecretGetter);
+        CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
 
     assertThat(credential).isNotEmpty();
     assertThat(credential.get()).isInstanceOf(GcpFileCredentials.class);
@@ -114,7 +116,7 @@ public class CredentialsFactoryTest {
         };
 
     Optional<StandardCredentials> credential =
-        CredentialsFactory.create("foo", labels, mockSecretGetter);
+        CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
 
     assertThat(credential).isNotEmpty();
     assertThat(credential.get()).isInstanceOf(GcpUsernamePasswordCredentials.class);
@@ -188,7 +190,7 @@ public class CredentialsFactoryTest {
         };
 
     Optional<StandardCredentials> credential =
-        CredentialsFactory.create("foo", labels, mockSecretGetter);
+        CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
 
     assertThat(credential).isNotEmpty();
     assertThat(credential.get()).isInstanceOf(GcpSshUserPrivateKey.class);
@@ -223,7 +225,7 @@ public class CredentialsFactoryTest {
         };
 
     Optional<StandardCredentials> credential =
-        CredentialsFactory.create("foo", labels, mockSecretGetter);
+        CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
 
     assertThat(credential).isNotEmpty();
     assertThat(credential.get()).isInstanceOf(GcpCertificateCredentials.class);
