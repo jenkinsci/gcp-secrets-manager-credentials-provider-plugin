@@ -24,6 +24,8 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
   private static final Logger LOGGER = Logger.getLogger(CredentialsSupplier.class.getName());
 
+  private static final String DEFAULT_FILTER = "labels.jenkins-credentials-type:*";
+
   public static Supplier<Collection<StandardCredentials>> standard() {
     return new CredentialsSupplier();
   }
@@ -37,6 +39,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
     String[] projectIds;
     String[] filters = new String[0];
+    String fullServerSideFilter = DEFAULT_FILTER;
 
     if (filter != null && filter.getValue() != null) {
       filters = filter.getValue().split(",");
@@ -59,10 +62,12 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
             ListSecretsRequest.newBuilder().setParent(ProjectName.of(projectId).toString());
 
         if (serverSideFilter != null && serverSideFilter.getFilter() != null) {
-          builder.setFilter(serverSideFilter.getFilter());
+          fullServerSideFilter += " AND (" + serverSideFilter.getFilter() + ")";
         }
 
-        listSecretsRequest = builder.build();
+        LOGGER.info(String.format("Using filter \"%s\" to list secrets for %s", fullServerSideFilter, projectId));
+
+        listSecretsRequest = builder.setFilter(fullServerSideFilter).build();
 
         SecretManagerServiceClient.ListSecretsPagedResponse secrets =
             client.listSecrets(listSecretsRequest);
@@ -77,9 +82,11 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
               final String labelValue = labelsMap.get(matchingLabel);
 
               if (!matchesLabel(labelValue, filters)) {
+                LOGGER.info(String.format("Secret %s does not match provided filter", secret.getName()));
                 continue;
               }
             } else {
+              LOGGER.info(String.format("Secret %s does not match provided filter", secret.getName()));
               continue;
             }
           }
