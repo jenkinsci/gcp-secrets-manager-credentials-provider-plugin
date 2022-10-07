@@ -78,8 +78,6 @@ public class GcpCredentialsStore extends CredentialsStore {
     return action;
   }
 
-
-
   @ExportedBean
   public static class GcpCredentialsStoreAction extends CredentialsStoreAction {
 
