@@ -7,47 +7,38 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CredentialsFactory {
+
+  private static final Logger LOGGER = Logger.getLogger(CredentialsFactory.class.getName());
 
   public static Optional<StandardCredentials> create(
       String name, String project, Map<String, String> labels, SecretGetter secretGetter) {
     final String description = name + " (" + project + ")";
     final String type = labels.getOrDefault(Labels.TYPE, "");
-    final String username = labels.getOrDefault(Labels.USERNAME, "");
-    final String fileExtension = labels.getOrDefault(Labels.FILE_EXTENSION, "");
-    String filename = labels.getOrDefault(Labels.FILENAME, "");
 
-    if (!"".equals(fileExtension)) {
-      filename = filename + "." + fileExtension;
+    LOGGER.log(Level.FINE, "Checking GCP secret: " + name);
+
+    GcpCredentialsConverter lookup = GcpCredentialsConverter.lookup(type);
+
+    if (lookup != null) {
+      try {
+        return Optional.of(lookup.resolve(name, description, labels, secretGetter));
+      } catch (Exception ex) {
+        if (LOGGER.isLoggable(Level.FINE)) {
+          LOGGER.log(Level.FINE, "Failed to convert Secret");
+        } else {
+          LOGGER.log(Level.WARNING, String.format("Failed to convert Secret %s of type %s", name, type), ex);
+        }
+      }
     }
 
-    switch (type) {
-      case Type.STRING:
-        return Optional.of(
-            new GcpStringCredentials(name, description, new SecretSupplier(name, secretGetter)));
-      case Type.FILE:
-        return Optional.of(
-            new GcpFileCredentials(
-                name, description, filename, new SecretBytesSupplier(name, secretGetter)));
-      case Type.USERNAME_PASSWORD:
-        return Optional.of(
-            new GcpUsernamePasswordCredentials(
-                name, description, new SecretSupplier(name, secretGetter), username));
-      case Type.SSH_USER_PRIVATE_KEY:
-        return Optional.of(
-            new GcpSshUserPrivateKey(
-                name, description, new SecretSupplier(name, secretGetter), username));
-      case Type.CERTIFICATE:
-        return Optional.of(
-            new GcpCertificateCredentials(
-                name, description, new SecretBytesSupplier(name, secretGetter)));
-      default:
-        return Optional.empty();
-    }
+    return Optional.empty();
   }
 
-  private static class SecretBytesSupplier implements Supplier<SecretBytes>, Serializable {
+  public static class SecretBytesSupplier implements Supplier<SecretBytes>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -65,7 +56,7 @@ public class CredentialsFactory {
     }
   }
 
-  private static class SecretSupplier implements Supplier<Secret>, Serializable {
+  public static class SecretSupplier implements Supplier<Secret>, Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -65,7 +65,9 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
           fullServerSideFilter += " AND (" + serverSideFilter.getFilter() + ")";
         }
 
-        LOGGER.info(String.format("Using filter \"%s\" to list secrets for %s", fullServerSideFilter, projectId));
+        LOGGER.info(
+            String.format(
+                "Using filter \"%s\" to list secrets for %s", fullServerSideFilter, projectId));
 
         listSecretsRequest = builder.setFilter(fullServerSideFilter).build();
 
@@ -82,11 +84,13 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
               final String labelValue = labelsMap.get(matchingLabel);
 
               if (!matchesLabel(labelValue, filters)) {
-                LOGGER.info(String.format("Secret %s does not match provided filter", secret.getName()));
+                LOGGER.info(
+                    String.format("Secret %s does not match provided filter", secret.getName()));
                 continue;
               }
             } else {
-              LOGGER.info(String.format("Secret %s does not match provided filter", secret.getName()));
+              LOGGER.info(
+                  String.format("Secret %s does not match provided filter", secret.getName()));
               continue;
             }
           }
