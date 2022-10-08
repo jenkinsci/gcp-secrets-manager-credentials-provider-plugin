@@ -95,15 +95,6 @@ Where the secret was created with the following command:
 kubectl create secret generic gcp-sa-secret --from-file=/tmp/sa.json
 ```
 
-### Client Side Filtering
-
-If you are sharing a GCP project across multiple Jenkins instances, you can use the filtering feature to control which
-secrets get added to the credential store. This feature allows you to specify a custom label and value(s) that each 
-secret must have in order to be added to the store. Note that Jenkins will still need IAM permissions to list and get all other secrets.
-
-You can use a comma-separated string for the label value, which will tell Jenkins to add the secret to the store
-if it matches any of the provided values.
-
 ### Server Side Filtering
 
 Server side filtering allows to filter on several properties, a list of Learn more about [Secret Manager server-side filtering in the documentation](https://cloud.google.com/secret-manager/docs/filtering).
@@ -115,6 +106,17 @@ _Retrive only secrets with the label of the value production_
 labels.environment:production
 ```
 
+### Client Side Filtering
+
+** Deprecated **
+
+If you are sharing a GCP project across multiple Jenkins instances, you can use the filtering feature to control which
+secrets get added to the credential store. This feature allows you to specify a custom label and value(s) that each
+secret must have in order to be added to the store. Note that Jenkins will still need IAM permissions to list and get all other secrets.
+
+You can use a comma-separated string for the label value, which will tell Jenkins to add the secret to the store
+if it matches any of the provided values.
+
 
 ### JCasC
 
@@ -123,6 +125,7 @@ You can use [JCasC](https://www.jenkins.io/projects/jcasc/) to set the GCP proje
 ```yaml
 unclassified:
   gcpCredentialsProvider:
+    serverSideFilter: "labels.foo:bar OR labels.foo:baz"
     filter:
       label: "my-label"
       value: "my-value-1,my-value-2"
