@@ -11,7 +11,7 @@
 
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>gcp-secrets-manager-credentials-provider</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <name>GCP Secrets Manager Credentials Provider</name>
@@ -43,7 +43,7 @@
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/${project.artifactId}-plugin.git
         </developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-        <tag>v0.3.0</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <properties>
