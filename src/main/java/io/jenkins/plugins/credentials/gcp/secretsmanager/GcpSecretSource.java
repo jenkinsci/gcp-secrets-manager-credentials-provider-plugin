@@ -1,14 +1,12 @@
-package io.jenkins.plugins.casc.secretsmanager;
+package io.jenkins.plugins.credentials.gcp.secretsmanager;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.SecretSource;
-import io.jenkins.plugins.credentials.gcp.secretsmanager.GcpCredentialsProvider;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 
