@@ -57,6 +57,10 @@ public class GcpCredentialsProvider extends CredentialsProvider {
     return object == Jenkins.get() ? gcpCredentialsStore : null;
   }
 
+  public Supplier<Collection<StandardCredentials>> getSupplier() {
+    return credentialsSupplier;
+  }
+
   @Override
   public String getIconClassName() {
     return "icon-gcp-secrets-manager-credentials-store";
