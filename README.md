@@ -125,7 +125,8 @@ You can use [JCasC](https://www.jenkins.io/projects/jcasc/) to set the GCP proje
 ```yaml
 unclassified:
   gcpCredentialsProvider:
-    serverSideFilter: "labels.foo:bar OR labels.foo:baz"
+    serverSideFilter:
+      filter: "labels.foo:bar OR labels.foo:baz"
     filter:
       label: "my-label"
       value: "my-value-1,my-value-2"
