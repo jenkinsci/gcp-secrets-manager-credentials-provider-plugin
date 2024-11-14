@@ -109,7 +109,7 @@ public class CredentialsSupplier implements Supplier<Collection<StandardCredenti
 
     } catch (IOException | ApiException e) {
       LOGGER.log(Level.WARNING, Messages.couldNotRetrieveCredentialError(), e);
-      return Collections.emptyList();
+      throw new RuntimeException(e);
     }
   }
 
