@@ -11,6 +11,7 @@ import hudson.Extension;
 import hudson.model.ItemGroup;
 import hudson.model.ModelObject;
 import hudson.security.ACL;
+import io.jenkins.plugins.credentials.gcp.secretsmanager.config.PluginConfiguration;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,12 +42,23 @@ public class GcpCredentialsProvider extends CredentialsProvider {
       @Nullable ItemGroup itemGroup,
       @Nullable Authentication authentication) {
     if (ACL.SYSTEM.equals(authentication)) {
-      final Collection<StandardCredentials> credentials = credentialsSupplier.get();
 
-      return credentials.stream()
-          .filter(c -> type.isAssignableFrom(c.getClass()))
-          .map(type::cast)
-          .collect(Collectors.toList());
+      // Don't cache if the plugin is not configured
+      String project = PluginConfiguration.getInstance().getProject();
+      if (project == null || "".equals(project)) {
+        return Collections.emptyList();
+      }
+
+      try {
+        final Collection<StandardCredentials> credentials = credentialsSupplier.get();
+
+        return credentials.stream()
+            .filter(c -> type.isAssignableFrom(c.getClass()))
+            .map(type::cast)
+            .collect(Collectors.toList());
+      } catch (RuntimeException e) {
+        return Collections.emptyList();
+      }
     }
 
     return Collections.emptyList();
