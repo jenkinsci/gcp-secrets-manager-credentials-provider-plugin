@@ -12,6 +12,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class PluginConfiguration extends GlobalConfiguration {
 
   private String project;
+  private String location;
   private Filter filter;
   private ServerSideFilter serverSideFilter;
 
@@ -31,6 +32,15 @@ public class PluginConfiguration extends GlobalConfiguration {
   @SuppressWarnings("unused")
   public void setProject(String project) {
     this.project = project;
+    save();
+  }
+
+  public String getLocation() { return location; }
+
+  @DataBoundSetter
+  @SuppressWarnings("unused")
+  public void setLocation(String location) {
+    this.location = location;
     save();
   }
 

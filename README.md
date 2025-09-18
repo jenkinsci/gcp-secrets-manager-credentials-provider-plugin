@@ -95,6 +95,22 @@ Where the secret was created with the following command:
 kubectl create secret generic gcp-sa-secret --from-file=/tmp/sa.json
 ```
 
+### GCP Locations
+
+By default, the plugin fetches global secrets. If you want to fetch regional secrets, you can configure specific locations in the "GCP Locations" field.
+
+To fetch secrets from specific regions, provide a comma-separated list of region names. For example:
+
+```
+us-central1,us-east1
+```
+
+If you want to fetch both regional and global secrets, include global in your locations list:
+
+```
+us-central1,us-east1,global
+```
+
 ### Server Side Filtering
 
 Server side filtering allows to filter on several properties, a list of Learn more about [Secret Manager server-side filtering in the documentation](https://cloud.google.com/secret-manager/docs/filtering).
@@ -133,11 +149,32 @@ unclassified:
     project: "my-gcp-project1,my-gcp-project2"
 ```
 
+For regional secrets:
+
+```yaml
+unclassified:
+  gcpCredentialsProvider:
+    serverSideFilter:
+      filter: "labels.foo:bar OR labels.foo:baz"
+    filter:
+      label: "my-label"
+      value: "my-value-1,my-value-2"
+    project: "my-gcp-project1,my-gcp-project2"
+    location: "us-central1,us-east1"
+```
+
 ## Examples
 
+### To create regional secrets
+
+```
+gcloud config set api_endpoint_overrides/secretmanager https://secretmanager.us-central1.rep.googleapis.com/
+```
 ### Secret Text
 
 Set the label `jenkins-credentials-type=string` to use the credential type.
+
+For global secret:
 
 ```shell script
 echo -n 's3cr3t' | gcloud secrets create datadog-api-key \
@@ -145,6 +182,17 @@ echo -n 's3cr3t' | gcloud secrets create datadog-api-key \
   --labels=jenkins-credentials-type=string \
   --replication-policy=automatic \
   --project=my-project
+```
+
+For regional secret:
+
+```shell script
+echo -n 's3cr3t' | gcloud secrets create datadog-api-key \
+  --data-file=- \
+  --labels=jenkins-credentials-type=string \
+  --replication-policy=automatic \
+  --project=my-project \
+  --location=us-central1
 ```
 
 Scripted pipeline:
@@ -166,12 +214,25 @@ Additional labels:
 * jenkins-credentials-filename
 * jenkins-credentials-file-extension
 
+For global secret:
+
 ```shell script
 gcloud secrets create serviceacount \
   --data-file=my-file.json \
   --labels=jenkins-credentials-type=file,jenkins-credentials-filename=serviceaccount,jenkins-credentials-file-extension=json \
   --replication-policy=automatic \
   --project=my-project
+```
+
+For regional secret:
+
+```shell script
+gcloud secrets create serviceacount \
+  --data-file=my-file.json \
+  --labels=jenkins-credentials-type=file,jenkins-credentials-filename=serviceaccount,jenkins-credentials-file-extension=json \
+  --replication-policy=automatic \
+  --project=my-project \
+  --location=us-central1
 ```
 
 Scripted pipeline:
@@ -192,12 +253,25 @@ Additional labels:
 
 * jenkins-credentials-username
 
+For global secret:
+
 ```shell script
 echo -n 's3cr3t' | gcloud secrets create nexus-creds \
   --data-file=- \
   --labels=jenkins-credentials-type=username-password,jenkins-credentials-username=nexus-user \
   --replication-policy=automatic \
   --project=my-project
+```
+
+For regional secret:
+
+```shell script
+echo -n 's3cr3t' | gcloud secrets create nexus-creds \
+  --data-file=- \
+  --labels=jenkins-credentials-type=username-password,jenkins-credentials-username=nexus-user \
+  --replication-policy=automatic \
+  --project=my-project \
+  --location=us-central1
 ```
 
 Scripted pipeline:
@@ -224,12 +298,25 @@ Additional labels:
 
 * jenkins-credentials-username
 
+For global secret:
+
 ```shell script
 gcloud secrets create ssh-key \
   --data-file=id_rsa \
   --labels=jenkins-credentials-type=ssh-user-private-key,jenkins-credentials-username=taylor \
   --replication-policy=automatic \
   --project=my-project
+```
+
+For regional secret:
+
+```shell script
+gcloud secrets create ssh-key \
+  --data-file=id_rsa \
+  --labels=jenkins-credentials-type=ssh-user-private-key,jenkins-credentials-username=taylor \
+  --replication-policy=automatic \
+  --project=my-project \
+  --location=us-central1
 ```
 
 Scripted pipeline:
@@ -246,12 +333,25 @@ node {
 
 Set the label `jenkins-credentials-type=certificate` to use the credential type.
 
+For global secret:
+
 ```shell script
 gcloud secrets create certificate \
   --data-file=keystore \
   --labels=jenkins-credentials-type=certificate \
   --replication-policy=automatic \
   --project=my-project
+```
+
+For regional secret:
+
+```shell script
+gcloud secrets create certificate \
+  --data-file=keystore \
+  --labels=jenkins-credentials-type=certificate \
+  --replication-policy=automatic \
+  --project=my-project \
+  --location=us-central1
 ```
 
 Scripted pipeline:

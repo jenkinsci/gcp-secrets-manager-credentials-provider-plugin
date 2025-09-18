@@ -3,8 +3,10 @@ package io.jenkins.plugins.credentials.gcp.secretsmanager;
 import com.cloudbees.plugins.credentials.CredentialsUnavailableException;
 import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
+import com.google.cloud.secretmanager.v1.LocationName;
 import com.google.cloud.secretmanager.v1.ProjectName;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import com.google.cloud.secretmanager.v1.SecretManagerServiceSettings;
 import com.google.cloud.secretmanager.v1.SecretPayload;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
 import io.jenkins.plugins.credentials.gcp.secretsmanager.config.Messages;
@@ -17,8 +19,11 @@ public class GcpSecretGetter implements SecretGetter, Serializable {
 
   private final String projectId;
 
-  public GcpSecretGetter(String projectId) {
+  private final String locationId;
+
+  public GcpSecretGetter(String projectId, String locationId) {
     this.projectId = projectId;
+    this.locationId = locationId;
   }
 
   @Override
@@ -32,19 +37,43 @@ public class GcpSecretGetter implements SecretGetter, Serializable {
   }
 
   private SecretPayload getPayload(String id) {
-    try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
-      final ProjectName project = ProjectName.of(projectId);
-      final SecretVersionName secretVersionName =
-          SecretVersionName.newBuilder()
-              .setProject(project.getProject())
-              .setSecret(id)
-              .setSecretVersion("latest")
-              .build();
-      final AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
-      return response.getPayload();
-    } catch (IOException | ApiException e) {
-      throw new CredentialsUnavailableException(
-          "secret", Messages.couldNotRetrieveCredentialError(), e);
+    SecretManagerServiceClient client;
+    final SecretVersionName secretVersionName;
+
+    if (locationId.equals("global")) {
+      try {
+        client = SecretManagerServiceClient.create();
+        final ProjectName project = ProjectName.of(projectId);
+        secretVersionName =
+            SecretVersionName.newBuilder()
+                .setProject(project.getProject())
+                .setSecret(id)
+                .setSecretVersion("latest")
+                .build();
+      } catch (IOException e) {
+        throw new CredentialsUnavailableException(
+            "secret", Messages.couldNotRetrieveCredentialError(), e);
+      }
+    } else {
+      String apiEndpoint = "secretmanager." + locationId + ".rep.googleapis.com:443";
+      SecretManagerServiceSettings secretManagerServiceSettings;
+      try {
+        secretManagerServiceSettings = SecretManagerServiceSettings.newBuilder().setEndpoint(apiEndpoint).build();
+        client = SecretManagerServiceClient.create(secretManagerServiceSettings);
+
+        final LocationName locationName = LocationName.of(projectId, locationId);
+        secretVersionName = SecretVersionName.newProjectLocationSecretSecretVersionBuilder()
+            .setProject(locationName.getProject())
+            .setLocation(locationName.getLocation())
+            .setSecret(id)
+            .setSecretVersion("latest")
+            .build();
+      } catch (IOException | ApiException e) {
+        throw new CredentialsUnavailableException(
+            "secret", Messages.couldNotRetrieveCredentialError(), e);
+      }
     }
+    final AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
+    return response.getPayload();
   }
 }

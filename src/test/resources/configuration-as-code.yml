@@ -6,3 +6,4 @@ unclassified:
     serverSideFilter:
       filter: "name:mysecret"
     project: "gcp-project"
+    location: "gcp-location"

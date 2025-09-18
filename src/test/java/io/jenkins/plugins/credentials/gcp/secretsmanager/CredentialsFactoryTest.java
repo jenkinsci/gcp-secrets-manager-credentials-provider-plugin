@@ -3,6 +3,7 @@ package io.jenkins.plugins.credentials.gcp.secretsmanager;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -12,13 +13,15 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 public class CredentialsFactoryTest {
 
-  @Rule public JenkinsRule jenkins = new JenkinsRule();
+  @Rule
+  public JenkinsRule jenkins = new JenkinsRule();
 
   @Test
   public void shouldGetStringCredentials() {
@@ -38,14 +41,20 @@ public class CredentialsFactoryTest {
           }
         };
 
-    Optional<StandardCredentials> credential =
+    Optional<StandardCredentials> credential1 =
         CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
+    Optional<StandardCredentials> credential2 =
+        CredentialsFactory.create("foo", "project", "location", labels, mockSecretGetter);
 
-    assertThat(credential).isNotEmpty();
-    assertThat(credential.get()).isInstanceOf(GcpStringCredentials.class);
-    assertThat(((GcpStringCredentials) credential.get()).getSecret().getPlainText())
+    assertThat(credential1).isNotEmpty();
+    assertThat(credential2).isNotEmpty();
+
+    assertThat(credential1.get()).isInstanceOf(GcpStringCredentials.class);
+    assertThat(credential2.get()).isInstanceOf(GcpStringCredentials.class);
+
+    assertThat(((GcpStringCredentials) credential1.get()).getSecret().getPlainText())
         .isEqualTo("bar");
-    assertThat(((GcpStringCredentials) credential.get()).getSecret().getPlainText())
+    assertThat(((GcpStringCredentials) credential2.get()).getSecret().getPlainText())
         .isEqualTo("bar");
   }
 
@@ -71,13 +80,18 @@ public class CredentialsFactoryTest {
           }
         };
 
-    Optional<StandardCredentials> credential =
+    Optional<StandardCredentials> credential1 =
         CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
+    Optional<StandardCredentials> credential2 =
+        CredentialsFactory.create("foo", "project", "location", labels, mockSecretGetter);
 
-    assertThat(credential).isNotEmpty();
-    assertThat(credential.get()).isInstanceOf(GcpFileCredentials.class);
+    assertThat(credential1).isNotEmpty();
+    assertThat(credential2).isNotEmpty();
 
-    final GcpFileCredentials gcpFileCredentials = (GcpFileCredentials) credential.get();
+    assertThat(credential1.get()).isInstanceOf(GcpFileCredentials.class);
+    assertThat(credential2.get()).isInstanceOf(GcpFileCredentials.class);
+
+    final GcpFileCredentials gcpFileCredentials = (GcpFileCredentials) credential1.get();
     final InputStream is = gcpFileCredentials.getContent();
 
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -94,6 +108,24 @@ public class CredentialsFactoryTest {
     String text = new String(byteArray, StandardCharsets.UTF_8);
     assertThat(text).isEqualTo(jsonFile);
     assertThat(gcpFileCredentials.getFileName()).isEqualTo("my_file.json");
+
+    final GcpFileCredentials gcpFileCredentialsWithLocation = (GcpFileCredentials) credential2.get();
+    final InputStream isWithLocation = gcpFileCredentialsWithLocation.getContent();
+
+    ByteArrayOutputStream bufferWithLocation = new ByteArrayOutputStream();
+    int nReadWithLocation;
+    byte[] dataWithLocation = new byte[1024];
+    while ((nReadWithLocation = isWithLocation.read(dataWithLocation, 0, dataWithLocation.length)) != -1) {
+      bufferWithLocation.write(dataWithLocation, 0, nReadWithLocation);
+    }
+
+    bufferWithLocation.flush();
+    byte[] byteArrayWithLocation = bufferWithLocation.toByteArray();
+    isWithLocation.close();
+
+    String textWithLocation = new String(byteArrayWithLocation, StandardCharsets.UTF_8);
+    assertThat(textWithLocation).isEqualTo(jsonFile);
+    assertThat(gcpFileCredentialsWithLocation.getFileName()).isEqualTo("my_file.json");
   }
 
   @Test
@@ -115,16 +147,24 @@ public class CredentialsFactoryTest {
           }
         };
 
-    Optional<StandardCredentials> credential =
+    Optional<StandardCredentials> credential1 =
         CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
+    Optional<StandardCredentials> credential2 =
+        CredentialsFactory.create("foo", "project", "location", labels, mockSecretGetter);
 
-    assertThat(credential).isNotEmpty();
-    assertThat(credential.get()).isInstanceOf(GcpUsernamePasswordCredentials.class);
+    assertThat(credential1).isNotEmpty();
+    assertThat(credential2).isNotEmpty();
+    assertThat(credential1.get()).isInstanceOf(GcpUsernamePasswordCredentials.class);
+    assertThat(credential2.get()).isInstanceOf(GcpUsernamePasswordCredentials.class);
 
-    final GcpUsernamePasswordCredentials gcpCredential =
-        ((GcpUsernamePasswordCredentials) credential.get());
-    assertThat(gcpCredential.getUsername()).isEqualTo("taylor");
-    assertThat(gcpCredential.getPassword().getPlainText()).isEqualTo("hunter2");
+    final GcpUsernamePasswordCredentials gcpCredential1 =
+        ((GcpUsernamePasswordCredentials) credential1.get());
+    final GcpUsernamePasswordCredentials gcpCredential2 =
+        ((GcpUsernamePasswordCredentials) credential2.get());
+    assertThat(gcpCredential1.getUsername()).isEqualTo("taylor");
+    assertThat(gcpCredential2.getUsername()).isEqualTo("taylor");
+    assertThat(gcpCredential1.getPassword().getPlainText()).isEqualTo("hunter2");
+    assertThat(gcpCredential2.getPassword().getPlainText()).isEqualTo("hunter2");
   }
 
   @Test
@@ -189,15 +229,22 @@ public class CredentialsFactoryTest {
           }
         };
 
-    Optional<StandardCredentials> credential =
+    Optional<StandardCredentials> credential1 =
         CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
+    Optional<StandardCredentials> credential2 =
+        CredentialsFactory.create("foo", "project", "location", labels, mockSecretGetter);
 
-    assertThat(credential).isNotEmpty();
-    assertThat(credential.get()).isInstanceOf(GcpSshUserPrivateKey.class);
+    assertThat(credential1).isNotEmpty();
+    assertThat(credential2).isNotEmpty();
+    assertThat(credential1.get()).isInstanceOf(GcpSshUserPrivateKey.class);
+    assertThat(credential2.get()).isInstanceOf(GcpSshUserPrivateKey.class);
 
-    final GcpSshUserPrivateKey gcpCredential = ((GcpSshUserPrivateKey) credential.get());
-    assertThat(gcpCredential.getUsername()).isEqualTo("taylor");
-    assertThat(gcpCredential.getPrivateKey()).isEqualTo(key);
+    final GcpSshUserPrivateKey gcpCredential1 = ((GcpSshUserPrivateKey) credential1.get());
+    final GcpSshUserPrivateKey gcpCredential2 = ((GcpSshUserPrivateKey) credential2.get());
+    assertThat(gcpCredential1.getUsername()).isEqualTo("taylor");
+    assertThat(gcpCredential2.getUsername()).isEqualTo("taylor");
+    assertThat(gcpCredential1.getPrivateKey()).isEqualTo(key);
+    assertThat(gcpCredential2.getPrivateKey()).isEqualTo(key);
   }
 
   @Test
@@ -224,13 +271,20 @@ public class CredentialsFactoryTest {
           }
         };
 
-    Optional<StandardCredentials> credential =
+    Optional<StandardCredentials> credential1 =
         CredentialsFactory.create("foo", "project", labels, mockSecretGetter);
+    Optional<StandardCredentials> credential2 =
+        CredentialsFactory.create("foo", "project", "location", labels, mockSecretGetter);
 
-    assertThat(credential).isNotEmpty();
-    assertThat(credential.get()).isInstanceOf(GcpCertificateCredentials.class);
 
-    final GcpCertificateCredentials gcpCredential = ((GcpCertificateCredentials) credential.get());
-    assertThat(gcpCredential.getKeyStore()).isNotNull();
+    assertThat(credential1).isNotEmpty();
+    assertThat(credential2).isNotEmpty();
+    assertThat(credential1.get()).isInstanceOf(GcpCertificateCredentials.class);
+    assertThat(credential2.get()).isInstanceOf(GcpCertificateCredentials.class);
+
+    final GcpCertificateCredentials gcpCredential1 = ((GcpCertificateCredentials) credential1.get());
+    final GcpCertificateCredentials gcpCredential2 = ((GcpCertificateCredentials) credential2.get());
+    assertThat(gcpCredential1.getKeyStore()).isNotNull();
+    assertThat(gcpCredential2.getKeyStore()).isNotNull();
   }
 }

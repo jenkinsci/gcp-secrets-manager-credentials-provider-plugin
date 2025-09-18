@@ -10,7 +10,8 @@ import org.junit.Test;
 
 public class ConfigurationAsCodeTest {
 
-  @Rule public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
+  @Rule
+  public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
 
   @Test
   @ConfiguredWithCode("configuration-as-code.yml")
@@ -18,6 +19,7 @@ public class ConfigurationAsCodeTest {
     PluginConfiguration configuration =
         (PluginConfiguration) r.jenkins.getDescriptor(PluginConfiguration.class);
     assertThat(configuration.getProject()).isEqualTo("gcp-project");
+    assertThat(configuration.getLocation()).isEqualTo("gcp-location");
     assertThat(configuration.getFilter().getLabel()).isEqualTo("my-label");
     assertThat(configuration.getFilter().getValue()).isEqualTo("my-value");
   }
